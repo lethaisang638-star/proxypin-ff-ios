@@ -1,4 +1,4 @@
-# fix_proxypin.py - SỬA LỖI THỤT LỀ VÀ REGEX
+# fix_proxypin.py
 import socket
 import threading
 import json
