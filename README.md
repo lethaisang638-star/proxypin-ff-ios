@@ -1,4 +1,4 @@
-
+# fix_proxypin.py - BẢN CHUẨN, KHÔNG LỖI
 import socket
 import threading
 import json
@@ -26,24 +26,20 @@ def handle_client(client_socket):
             client_socket.close()
             return
 
-        # KIỂM TRA REQUEST CHỨA CONFIG HOẶC VERSION
         if b"config" in request.lower() or b"version" in request.lower():
             response = f"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\n\r\n{json.dumps(FAKE_CONFIG)}"
             client_socket.send(response.encode())
         else:
-            # CHUYỂN TIẾP QUA PROXYPIN
             proxy_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             proxy_socket.connect((PROXY_HOST, PROXY_PORT))
             proxy_socket.send(request)
             response = proxy_socket.recv(8192)
 
-            # SỬA RESPONSE CHỨA VERSION (NẾU CÓ)
             try:
                 body_start = response.find(b"\r\n\r\n") + 4
                 if body_start > 4:
                     body = response[body_start:].decode('utf-8', errors='ignore')
                     if 'version' in body:
-                        # SỬA LỖI REGEX: THAY THẾ TOÀN BỘ TRƯỜNG VERSION
                         new_body = re.sub(r'"version"\s*:\s*"[^"]*"', '"version":"3.0.0"', body)
                         response = response[:body_start] + new_body.encode()
             except Exception as e:
